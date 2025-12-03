@@ -279,3 +279,44 @@ def delete_member(member_id):
 
 if __name__ == '__main__':
     app.run(debug=True)
+# 공지사항
+class Notice(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.Date, default=date.today)
+
+# Tip 게시판
+class Tip(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.Date, default=date.today)
+@app.route("/notice")
+def notice_list():
+    notices = Notice.query.order_by(Notice.id.desc()).all()
+    return render_template("notice_list.html", notices=notices)
+
+@app.route("/notice/write", methods=["GET", "POST"])
+def notice_write():
+    if request.method == "POST":
+        title = request.form["title"]
+        content = request.form["content"]
+        db.session.add(Notice(title=title, content=content))
+        db.session.commit()
+        return redirect("/notice")
+    return render_template("notice_write.html")
+@app.route("/tip")
+def tip_list():
+    tips = Tip.query.order_by(Tip.id.desc()).all()
+    return render_template("tip_list.html", tips=tips)
+
+@app.route("/tip/write", methods=["GET", "POST"])
+def tip_write():
+    if request.method == "POST":
+        title = request.form["title"]
+        content = request.form["content"]
+        db.session.add(Tip(title=title, content=content))
+        db.session.commit()
+        return redirect("/tip")
+    return render_template("tip_write.html")

@@ -1,0 +1,12 @@
+<h2>Tip 게시판</h2>
+<a href="/tip/write">새 Tip 올리기</a>
+<hr>
+
+{% for t in tips %}
+<div>
+    <h3>{{ t.title }}</h3>
+    <p>{{ t.content }}</p>
+    <small>{{ t.created_at }}</small>
+    <hr>
+</div>
+{% endfor %}

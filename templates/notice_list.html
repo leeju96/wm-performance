@@ -1,0 +1,12 @@
+<h2>공지사항</h2>
+<a href="/notice/write">새 공지 올리기</a>
+<hr>
+
+{% for n in notices %}
+<div>
+    <h3>{{ n.title }}</h3>
+    <p>{{ n.content }}</p>
+    <small>{{ n.created_at }}</small>
+    <hr>
+</div>
+{% endfor %}

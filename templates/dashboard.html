@@ -3,127 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <title>WM성과</title>
-<link rel="manifest" href="/static/manifest.json">
-<script>
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/static/service-worker.js");
-  }
-</script>
-<meta name="theme-color" content="#000000">
 
-    <!-- 부트스트랩 -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    >
-    <!-- Chart.js (그래프용) -->
+    <!-- PWA -->
+    <link rel="manifest" href="/static/manifest.json">
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("/static/service-worker.js");
+      }
+    </script>
+    <meta name="theme-color" content="#000000">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body class="bg-light">
+
+<!-- 🔥 메뉴바 -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">WM 성과</a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+        <li class="nav-item">
+          <a class="nav-link" href="/notice">공지사항</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="/tip">Tip</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="/">홈</a>
+        </li>
+
+      </ul>
+
+      <!-- 오른쪽 로그아웃 -->
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link text-danger" href="/logout">로그아웃</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+<!-- 🔥 컨텐츠 시작 -->
 <div class="container py-4">
+
     <h1 class="mb-1">WM성과</h1>
-<p class="text-muted mb-4">오늘 날짜: {{ today.strftime('%Y-%m-%d') }}</p>
-<!-- 팀원 목록 표시 -->
-<div class="card mb-4">
-    <div class="card-header">팀원 목록</div>
-    <div class="card-body">
-        {% if members %}
-            <ul class="mb-0">
-                {% for m in members %}
-                <li>
-                    <a href="/member/{{ m.id }}">{{ m.name }}</a>
-                    {% if m.role %} <span class="text-muted">({{ m.role }})</span> {% endif %}
-                </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p class="text-muted mb-0">등록된 팀원이 없습니다.</p>
-        {% endif %}
-    </div>
-</div>
+    <p class="text-muted mb-4">오늘 날짜: {{ today.strftime('%Y-%m-%d') }}</p>
 
-<!-- 조회 월 + 기간 검색 -->
-<form method="get" class="mb-4">
-    <div class="row g-2 align-items-center mb-2">
-        <div class="col-auto">
-            <label class="col-form-label">조회 월</label>
-        </div>
-        <div class="col-auto">
-            <input type="month" name="month" class="form-control" value="{{ current_month }}">
-        </div>
-        <div class="col-auto">
-            <button class="btn btn-outline-primary" type="submit">월 적용</button>
-        </div>
-        <div class="col-auto">
-            <span class="text-muted small">(현재: {{ current_month }})</span>
+    <!-- 팀원 목록 -->
+    <div class="card mb-4">
+        <div class="card-header">팀원 목록</div>
+        <div class="card-body">
+            {% if members %}
+                <ul class="mb-0">
+                    {% for m in members %}
+                    <li>
+                        <a href="/member/{{ m.id }}">{{ m.name }}</a>
+                        {% if m.role %} 
+                            <span class="text-muted">({{ m.role }})</span>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted mb-0">등록된 팀원이 없습니다.</p>
+            {% endif %}
         </div>
     </div>
 
-    <div class="row g-2 align-items-center">
-        <div class="col-auto">
-            <label class="col-form-label">기간 검색</label>
+
+    <!-- 조회 월 + 날짜 기간 검색 -->
+    <form method="get" class="mb-4">
+
+        <div class="row g-2 align-items-center mb-2">
+            <div class="col-auto"><label class="col-form-label">조회 월</label></div>
+            <div class="col-auto">
+                <input type="month" name="month" class="form-control" value="{{ current_month }}">
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-outline-primary">월 적용</button>
+            </div>
         </div>
-        <div class="col-auto">
-            <input type="date" name="start_date" class="form-control" value="{{ start_date_value }}">
+
+        <div class="row g-2 align-items-center">
+            <div class="col-auto"><label class="col-form-label">기간 검색</label></div>
+            <div class="col-auto"><input type="date" name="start_date" class="form-control" value="{{ start_date_value }}"></div>
+            <div class="col-auto"><span class="col-form-label">~</span></div>
+            <div class="col-auto"><input type="date" name="end_date" class="form-control" value="{{ end_date_value }}"></div>
+            <div class="col-auto"><button class="btn btn-outline-success">기간 적용</button></div>
+            <div class="col-auto">
+                <button class="btn btn-outline-secondary" 
+                        onclick="this.form.start_date.value=''; this.form.end_date.value='';">
+                    초기화
+                </button>
+            </div>
         </div>
-        <div class="col-auto">
-            <span class="col-form-label">~</span>
-        </div>
-        <div class="col-auto">
-            <input type="date" name="end_date" class="form-control" value="{{ end_date_value }}">
-        </div>
-        <div class="col-auto">
-            <button class="btn btn-outline-success" type="submit">기간 적용</button>
-        </div>
-        <div class="col-auto">
-            <button class="btn btn-outline-secondary" type="submit"
-                    onclick="this.form.start_date.value=''; this.form.end_date.value='';">
-                기간 초기화
-            </button>
-        </div>
-    </div>
-</form>
+
+    </form>
 
 
-    <!-- 위: 팀원 추가 / 성과 기록 입력 -->
+    <!-- 팀원 추가 & 성과 기록 입력 -->
     <div class="row mb-4">
-        <!-- 팀원 추가 -->
+
         <div class="col-md-4 mb-3">
             <div class="card">
-                <div class="card-header">팀원 관리</div>
+                <div class="card-header">팀원 추가</div>
                 <div class="card-body">
                     <form method="post" action="{{ url_for('add_member') }}">
                         <div class="mb-2">
                             <label class="form-label">이름</label>
                             <input type="text" name="name" class="form-control" required>
                         </div>
+
                         <div class="mb-2">
-                            <label class="form-label">직책 / 역할</label>
-                            <input type="text" name="role" class="form-control" placeholder="예: 나, 팀원A 등">
+                            <label class="form-label">직책</label>
+                            <input type="text" name="role" class="form-control">
                         </div>
-                        <div class="mb-2">
-                            <label class="form-label">메모</label>
-                            <textarea name="note" class="form-control" rows="2"></textarea>
-                        </div>
-                        <button class="btn btn-primary w-100" type="submit">팀원 추가</button>
+
+                        <button class="btn btn-primary w-100">추가</button>
                     </form>
                 </div>
             </div>
         </div>
 
-        <!-- 성과 기록 입력 -->
+
         <div class="col-md-8 mb-3">
             <div class="card">
-                <div class="card-header">성과 기록</div>
+                <div class="card-header">성과 기록 입력</div>
                 <div class="card-body">
                     <form method="post" action="{{ url_for('add_log') }}">
+
                         <div class="row">
                             <div class="col-md-3 mb-2">
                                 <label class="form-label">날짜</label>
                                 <input type="date" name="log_date" class="form-control">
                             </div>
+
                             <div class="col-md-3 mb-2">
-                                <label class="form-label">누구</label>
+                                <label class="form-label">팀원</label>
                                 <select name="member_id" class="form-select" required>
                                     <option value="">선택</option>
                                     {% for m in members %}
@@ -131,235 +164,141 @@
                                     {% endfor %}
                                 </select>
                             </div>
+
                             <div class="col-md-3 mb-2">
-                                <label class="form-label">후원금액(원)</label>
+                                <label class="form-label">후원금액</label>
                                 <input type="number" name="sponsor_amount" class="form-control" value="0">
                             </div>
+
                             <div class="col-md-3 mb-2">
                                 <label class="form-label">건수</label>
                                 <input type="number" name="count" class="form-control" value="1">
                             </div>
                         </div>
-                        <button class="btn btn-success mt-2" type="submit">기록 저장</button>
+
+                        <button class="btn btn-success mt-2">저장</button>
+
                     </form>
                 </div>
             </div>
         </div>
+
     </div>
 
-    <!-- 나의 성과기록 -->
+
+    <!-- 나의 성과 기록 -->
     <div class="row mb-4">
+
         <div class="col-md-6 mb-3">
             <div class="card">
-                <div class="card-header">
-                    나의 성과기록
-                    {% if my_member %}
-                        <small class="text-muted">({{ my_member.name }} 기준)</small>
-                    {% endif %}
-                </div>
+                <div class="card-header">나의 성과 기록</div>
                 <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-striped mb-0">
-                            <thead class="table-light">
+                    <table class="table table-striped mb-0">
+                        <thead class="table-light">
+                            <tr><th>날짜</th><th class="text-end">금액</th><th class="text-end">건수</th></tr>
+                        </thead>
+                        <tbody>
+                        {% for log in my_logs %}
                             <tr>
-                                <th>날짜</th>
-                                <th class="text-end">금액(원)</th>
-                                <th class="text-end">건수</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for log in my_logs %}
-                            <tr>
-                                <td>{{ log.log_date.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ log.log_date }}</td>
                                 <td class="text-end">{{ "{:,}".format(log.sponsor_amount) }}</td>
                                 <td class="text-end">{{ log.count }}</td>
                             </tr>
-                            {% endfor %}
-                            {% if my_logs|length == 0 %}
-                            <tr>
-                                <td colspan="3" class="text-center text-muted py-3">
-                                    아직 나의 성과 기록이 없습니다.
-                                </td>
-                            </tr>
-                            {% endif %}
-                            </tbody>
-                        </table>
-                    </div>
+                        {% endfor %}
+                        {% if my_logs|length == 0 %}
+                            <tr><td colspan="3" class="text-center text-muted py-3">기록 없음</td></tr>
+                        {% endif %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
-        <!-- 성과표 (그래프) -->
+
+        <!-- 그래프 -->
         <div class="col-md-6 mb-3">
             <div class="card">
-                <div class="card-header">성과표 (그래프)</div>
+                <div class="card-header">그래프</div>
                 <div class="card-body">
-                    <p class="small text-muted">팀원별 금액 / 건수 비교</p>
-                    <canvas id="amountChart" class="mb-3" height="160"></canvas>
+                    <canvas id="amountChart" height="160"></canvas>
                     <canvas id="countChart" height="160"></canvas>
                 </div>
             </div>
         </div>
+
     </div>
 
-    <!-- 전체 최근 성과 기록 -->
+
+    <!-- 전체 최근 기록 -->
     <div class="card">
-        <div class="card-header">최근 성과 기록 (최대 50개)</div>
+        <div class="card-header">최근 성과 기록</div>
         <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-striped mb-0">
-                    <thead class="table-light">
+            <table class="table table-striped mb-0">
+                <thead class="table-light">
                     <tr>
                         <th>날짜</th>
-                        <th>누구</th>
-                        <th class="text-end">후원금액(원)</th>
+                        <th>팀원</th>
+                        <th class="text-end">금액</th>
                         <th class="text-end">건수</th>
                         <th></th>
                     </tr>
-                    </thead>
-                    <tbody>
-                    {% for log in logs %}
-                    <tr>
-                        <td>{{ log.log_date.strftime('%Y-%m-%d') }}</td>
-                        <td>
-    <a href="/member/{{ log.member.id }}">
-        {{ log.member.name }}
-    </a>
-</td>
+                </thead>
+                <tbody>
 
-                        <td class="text-end">{{ "{:,}".format(log.sponsor_amount) }}</td>
-                        <td class="text-end">{{ log.count }}</td>
-                        <td class="text-end">
-                            <form method="post" action="{{ url_for('delete_log', log_id=log.id) }}">
-                                <button class="btn btn-sm btn-outline-danger"
-                                        onclick="return confirm('삭제할까?');">
-                                    삭제
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    {% if logs|length == 0 %}
-                    <tr>
-                        <td colspan="5" class="text-center text-muted py-3">아직 기록이 없습니다.</td>
-                    </tr>
-                    {% endif %}
-                    </tbody>
-                </table>
-            </div>
+                {% for log in logs %}
+                <tr>
+                    <td>{{ log.log_date }}</td>
+                    <td>
+                        <a href="/member/{{ log.member.id }}">{{ log.member.name }}</a>
+                    </td>
+                    <td class="text-end">{{ "{:,}".format(log.sponsor_amount) }}</td>
+                    <td class="text-end">{{ log.count }}</td>
+                    <td class="text-end">
+                        <form method="post" action="/delete/{{ log.id }}">
+                            <button class="btn btn-sm btn-outline-danger">삭제</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+
+                {% if logs|length == 0 %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-3">기록 없음</td>
+                </tr>
+                {% endif %}
+
+                </tbody>
+            </table>
         </div>
     </div>
 
 </div>
 
+<!-- 그래프 스크립트 -->
 <script>
     const labels = {{ chart_labels | tojson }};
     const amounts = {{ chart_amounts | tojson }};
-    const counts = {{ chart_counts | tojson }};
+    const counts  = {{ chart_counts | tojson }};
 
-    const ctxAmount = document.getElementById('amountChart');
-    if (ctxAmount && labels.length > 0) {
-        new Chart(ctxAmount, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: '후원금액(원)',
-                    data: amounts
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false },
-                    title: { display: false }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    }
-
-    const ctxCount = document.getElementById('countChart');
-    if (ctxCount && labels.length > 0) {
-        new Chart(ctxCount, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: '건수',
-                    data: counts
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false },
-                    title: { display: false }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        precision: 0
-                    }
-                }
-            }
-        });
-    }
-</script>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import { getMessaging, getToken, onMessage } 
-    from "https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyBy_EMdPVGh2u4UEXlro90TZcCl_mfTg_s",
-    authDomain: "wm-performance.firebaseapp.com",
-    projectId: "wm-performance",
-    storageBucket: "wm-performance.firebasestorage.app",
-    messagingSenderId: "802188460964",
-    appId: "1:802188460964:web:2f464c2ea4eed83ab93731",
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const messaging = getMessaging(app);
-
-  // 🔥 너가 Firebase에서 받은 VAPID PUBLIC KEY
-  const vapidKey = "Z6n18eqh0x5GqnZl7pxLvuNAcDvlnCkOqNtu4tB6138";
-
-  // 🔔 브라우저 알림 권한 요청 + FCM 토큰 발급
-  async function requestPermission() {
-    const permission = await Notification.requestPermission();
-    if (permission === "granted") {
-      const token = await getToken(messaging, {
-        vapidKey: vapidKey
+    // 금액 그래프
+    if (labels.length > 0) {
+      new Chart(document.getElementById("amountChart"), {
+        type: "bar",
+        data: { labels: labels, datasets: [{ data: amounts, label: "후원금액" }] },
+        options: { scales: { y: { beginAtZero: true } } }
       });
-
-      console.log("🔥 FCM Token:", token);
-      alert("알림이 활성화되었습니다!");
-
-      // TODO: 필요하면 이 토큰을 DB에 저장하여 특정 기기로 알림 보내기 가능
-    } else {
-      alert("알림 권한이 거부되었습니다.");
     }
-  }
 
-  // 페이지가 로드되면 자동 실행 or 버튼 만들어 실행 가능
-  requestPermission();
-
-  // 🔔 페이지가 열려있을 때 오는 알림 처리
-  onMessage(messaging, (payload) => {
-    console.log("📩 Foreground Message:", payload);
-
-    new Notification(payload.notification.title, {
-      body: payload.notification.body,
-      icon: "/static/icon192.png"
-    });
-  });
+    // 건수 그래프
+    if (labels.length > 0) {
+      new Chart(document.getElementById("countChart"), {
+        type: "bar",
+        data: { labels: labels, datasets: [{ data: counts, label: "건수" }] },
+        options: { scales: { y: { beginAtZero: true } } }
+      });
+    }
 </script>
 
 </body>
 </html>
+
