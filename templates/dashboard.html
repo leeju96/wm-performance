@@ -310,6 +310,56 @@
         });
     }
 </script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getMessaging, getToken, onMessage } 
+    from "https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBy_EMdPVGh2u4UEXlro90TZcCl_mfTg_s",
+    authDomain: "wm-performance.firebaseapp.com",
+    projectId: "wm-performance",
+    storageBucket: "wm-performance.firebasestorage.app",
+    messagingSenderId: "802188460964",
+    appId: "1:802188460964:web:2f464c2ea4eed83ab93731",
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const messaging = getMessaging(app);
+
+  // 🔥 너가 Firebase에서 받은 VAPID PUBLIC KEY
+  const vapidKey = "Z6n18eqh0x5GqnZl7pxLvuNAcDvlnCkOqNtu4tB6138";
+
+  // 🔔 브라우저 알림 권한 요청 + FCM 토큰 발급
+  async function requestPermission() {
+    const permission = await Notification.requestPermission();
+    if (permission === "granted") {
+      const token = await getToken(messaging, {
+        vapidKey: vapidKey
+      });
+
+      console.log("🔥 FCM Token:", token);
+      alert("알림이 활성화되었습니다!");
+
+      // TODO: 필요하면 이 토큰을 DB에 저장하여 특정 기기로 알림 보내기 가능
+    } else {
+      alert("알림 권한이 거부되었습니다.");
+    }
+  }
+
+  // 페이지가 로드되면 자동 실행 or 버튼 만들어 실행 가능
+  requestPermission();
+
+  // 🔔 페이지가 열려있을 때 오는 알림 처리
+  onMessage(messaging, (payload) => {
+    console.log("📩 Foreground Message:", payload);
+
+    new Notification(payload.notification.title, {
+      body: payload.notification.body,
+      icon: "/static/icon192.png"
+    });
+  });
+</script>
 
 </body>
 </html>

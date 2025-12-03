@@ -1,20 +1,20 @@
-self.addEventListener("install", event => {
-  self.skipWaiting();
+importScripts("https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js");
+importScripts("https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js");
+
+firebase.initializeApp({
+  apiKey: "AIzaSyBy_EMdPVGh2u4UEXlro90TZcCl_mfTg_s",
+  authDomain: "wm-performance.firebaseapp.com",
+  projectId: "wm-performance",
+  storageBucket: "wm-performance.firebasestorage.app",
+  messagingSenderId: "802188460964",
+  appId: "1:802188460964:web:2f464c2ea4eed83ab93731"
 });
 
-self.addEventListener("activate", event => {
-  clients.claim();
-});
+const messaging = firebase.messaging();
 
-self.addEventListener("fetch", event => {
-  event.respondWith(
-    caches.open("wm-cache").then(cache => {
-      return fetch(event.request)
-        .then(response => {
-          cache.put(event.request, response.clone());
-          return response;
-        })
-        .catch(() => cache.match(event.request));
-    })
-  );
+messaging.onBackgroundMessage((payload) => {
+  self.registration.showNotification(payload.notification.title, {
+    body: payload.notification.body,
+    icon: "/static/icon192.png",
+  });
 });
